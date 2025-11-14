@@ -1,52 +1,126 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class Main {
+
+    private static final Scanner scanner = new Scanner(System.in);
+
     public static void main(String[] args) {
 
-        // Initialize the database (drop and recreate table)
-        EmployeeDAO employeeDAO;
+        // Initialize the database (drop and recreate table with sample data)
         EmployeeDAO.initializeDatabase();
+        EmployeeDAO employeeDAO = new EmployeeDAO();
 
-        employeeDAO = new EmployeeDAO();
+        System.out.println("=== Employee Management System (JDBC + MySQL) ===");
 
-        // Test the CRUD operations
-        Employee employee1 = new Employee(0, "John", "abc@gmail.com", "USA");
-        Employee employee2 = new Employee(1, "John D.", "emp@gmail.com", "London");
+        boolean exit = false;
+        while (!exit) {
+            printMenu();
+            int choice = readInt("Enter your choice: ");
 
-        employeeDAO.insertEmployee(employee1);
-        employeeDAO.insertEmployee(employee2);
-        System.out.println(employeeDAO.getAllEmployees());
-        System.out.println();
+            switch (choice) {
+                case 1 -> employeeDAO.printEmployee();
+                case 2 -> addEmployee(employeeDAO);
+                case 3 -> updateEmployeeById(employeeDAO);
+                case 4 -> deleteEmployeeById(employeeDAO);
+                case 5 -> batchInsertSampleEmployees(employeeDAO);
+                case 6 -> findEmployeeById(employeeDAO);
+                case 0 -> {
+                    exit = true;
+                    System.out.println("Exiting application. Goodbye!");
+                }
+                default -> System.out.println("Invalid choice, please try again.");
+            }
+        }
 
-        // Update employee
-        employeeDAO.updateEmployeeById(3, "John Snow", "emp.updated@gmail.com", "London");
-        System.out.println("After update:");
-        employeeDAO.printEmployee();
-        // Update employee details by name
-        employeeDAO.updateEmployeeByName("Jane Smith", "Jane Doe", "jane.doe@gmail.com", "New York");
-        employeeDAO.printEmployee();
+        scanner.close();
+    }
 
-        // Update employee details by email
-        employeeDAO.updateEmployeeByEmail("emp@gmail.com", "Jane Doe", "emp.new@gmail.com", "New York");
-        employeeDAO.printEmployee();
+    private static void printMenu() {
+        System.out.println("\n----------- MENU -----------");
+        System.out.println("1. List all employees");
+        System.out.println("2. Add new employee");
+        System.out.println("3. Update employee by ID");
+        System.out.println("4. Delete employee by ID");
+        System.out.println("5. Batch insert sample employees");
+        System.out.println("6. Find employee by ID");
+        System.out.println("0. Exit");
+        System.out.println("----------------------------");
+    }
 
-        // Delete employee
-        employeeDAO.deleteEmployee(4);
+    private static int readInt(String message) {
+        while (true) {
+            System.out.print(message);
+            String line = scanner.nextLine();
+            try {
+                return Integer.parseInt(line.trim());
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid number.");
+            }
+        }
+    }
 
-        // Print table after delete
-        System.out.println("After delete:");
-        employeeDAO.printEmployee();
+    private static String readNonEmptyString(String message) {
+        while (true) {
+            System.out.print(message);
+            String line = scanner.nextLine().trim();
+            if (!line.isEmpty()) {
+                return line;
+            }
+            System.out.println("Input cannot be empty. Please try again.");
+        }
+    }
 
-        // Create a list of employees to batch insert
+    private static void addEmployee(EmployeeDAO employeeDAO) {
+        System.out.println("\n--- Add New Employee ---");
+        String name = readNonEmptyString("Name: ");
+        String email = readNonEmptyString("Email: ");
+        String country = readNonEmptyString("Country: ");
+
+        Employee employee = new Employee(name, email, country);
+        employeeDAO.insertEmployee(employee);
+    }
+
+    private static void updateEmployeeById(EmployeeDAO employeeDAO) {
+        System.out.println("\n--- Update Employee By ID ---");
+        int id = readInt("Enter employee ID: ");
+
+        String newName = readNonEmptyString("New name: ");
+        String newEmail = readNonEmptyString("New email: ");
+        String newCountry = readNonEmptyString("New country: ");
+
+        employeeDAO.updateEmployeeById(id, newName, newEmail, newCountry);
+    }
+
+    private static void deleteEmployeeById(EmployeeDAO employeeDAO) {
+        System.out.println("\n--- Delete Employee By ID ---");
+        int id = readInt("Enter employee ID to delete: ");
+        employeeDAO.deleteEmployee(id);
+    }
+
+    private static void batchInsertSampleEmployees(EmployeeDAO employeeDAO) {
+        System.out.println("\n--- Batch Insert Sample Employees ---");
+
         List<Employee> employees = new ArrayList<>();
-        employees.add(new Employee(0, "Emily Davis", "emily@example.com", "Australia"));
-        employees.add(new Employee(0, "David Brown", "david@example.com", "Germany"));
-        employees.add(new Employee(0, "Laura Wilson", "laura@example.com", "France"));
-        employees.add(new Employee(0, "Mike Johnson", "mike@example.com", "Canada"));
+        employees.add(new Employee("Emily Davis", "emily@example.com", "Australia"));
+        employees.add(new Employee("David Brown", "david@example.com", "Germany"));
+        employees.add(new Employee("Laura Wilson", "laura@example.com", "France"));
+        employees.add(new Employee("Mike Johnson", "mike@example.com", "Canada"));
 
-        // Perform batch insertion
         employeeDAO.batchInsertEmployees(employees);
         employeeDAO.printEmployee();
+    }
+
+    private static void findEmployeeById(EmployeeDAO employeeDAO) {
+        System.out.println("\n--- Find Employee By ID ---");
+        int id = readInt("Enter employee ID: ");
+
+        Employee employee = employeeDAO.getEmployeeById(id);
+        if (employee == null) {
+            System.out.println("No employee found with ID: " + id);
+        } else {
+            System.out.println("Found: " + employee);
+        }
     }
 }
