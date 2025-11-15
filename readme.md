@@ -1,7 +1,7 @@
 # JDBC CRUD Application
 This project is a simple Java application that demonstrates CRUD (Create, Read, Update, Delete) operations on a MySQL database using JDBC (Java Database Connectivity). The application includes functionalities for inserting, updating, deleting, and batch processing of employee records.
 
-JDBC provides a set of interfaces and classes for Java applications to interact with databases. It allows Java programs to establish connections to databases, execute SQL queries and statements, process query results, and handle transactions. With JDBC, developers can perform CRUD operations to manage data stored in relational databases from their Java applications.
+JDBC provides a set of interfaces and classes for Java applications to interact with databases. It allows Java programs to establish connections to databases, execute SQL queries and statements, process query results, and handle transactions. With JDBC, developers can perform CRUD operations to manage data stored in relational databases from their Java application.
 
 ## Development Environment and Dependencies
 
